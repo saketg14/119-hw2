@@ -96,17 +96,20 @@ def q5(rdd):
     return result[1][0] / result[1][1]
 
 def q6(rdd):
-    # Convert numbers to strings
+    # Convert numbers to strings so we can look at individual digits
     rdd1 = rdd.map(lambda x: (1, str(x)))
-    # Split into individual digits
-    rdd2 = general_map(rdd1, lambda k, v: [(int(d), 1) for d in v])
-    # Count each digit
+    # For each number string, emit (digit_character, 1) for every digit
+    rdd2 = general_map(rdd1, lambda k, v: [(d, 1) for d in v])
+    # Sum the counts for each digit using general_reduce
     rdd3 = general_reduce(rdd2, lambda x, y: x + y)
     counts = rdd3.collect()
+    # Sort by the count (the second element of each pair)
     counts_sorted = sorted(counts, key=lambda x: x[1])
     least = counts_sorted[0]
     most = counts_sorted[-1]
+    # Return most-common digit, its count, least-common digit, its count
     return (most[0], most[1], least[0], least[1])
+
 
 def number_to_english(n):
     """Convert a number to its English name"""
